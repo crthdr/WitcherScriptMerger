@@ -12,10 +12,23 @@ namespace WitcherScriptMerger.LoadOrder
         public const int TopPriority = 0;
         public const int BottomPriority = 9999;
 
-        public readonly string FilePath =
+        private string documentsW3;
+
+        public string DocumentsW3() {
+            if (documentsW3 == null) {
+                var lines = File.ReadAllLines(Path.Combine(Paths.GameDirectory, "bin", "gameconf.cfg"));
+                var title = lines.First(line => line.TrimStart().StartsWith("title"));
+                var start = title.IndexOf('"');
+                var end = title.LastIndexOf('"');
+                documentsW3 = title.Substring(start+1, end-start-1);
+            }
+            return documentsW3;
+        }
+
+        public string FilePath =>
             Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                "The Witcher 3",
+                DocumentsW3(),
                 "mods.settings");
 
         public List<ModLoadSetting> Mods { get; private set; }
