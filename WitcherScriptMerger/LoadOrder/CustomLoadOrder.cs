@@ -27,7 +27,24 @@ internal partial class CustomLoadOrder : IDisposable
 
 	private static readonly string LoadOrderDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "The Witcher 3");
 	private const string LoadOrderFileName = "mods.settings";
-	internal readonly string FilePath = Path.Combine(LoadOrderDirectory, LoadOrderFileName);
+
+	private string documentsW3;
+
+	public string DocumentsW3() {
+		if (documentsW3 == null) {
+			var lines = File.ReadAllLines(Path.Combine(Paths.GameDirectory, "bin", "gameconf.cfg"));
+			var title = lines.First(line => line.TrimStart().StartsWith("title", StringComparison.Ordinal));
+			var start = title.IndexOf('"', StringComparison.Ordinal);
+			var end = title.LastIndexOf('"');
+			documentsW3 = title.Substring(start+1, end-start-1);
+		}
+		return documentsW3;
+	}
+	internal string FilePath =>
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                DocumentsW3(),
+                "mods.settings");
 
 
 	internal bool IsValid { get; private set; }
